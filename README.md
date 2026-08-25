@@ -1,30 +1,43 @@
 # demo-wrapper-only
 
-Parent repository for running demo applications via Docker Compose. Application code lives in Git submodules; this repo provides stack orchestration, configuration, and tooling.
+Parent repository for running demo applications via shell scripts. Application code lives in Git submodules; this repo provides stack orchestration, configuration, and tooling.
 
 ## Prerequisites
 
-- [Docker](https://docs.docker.com/get-docker/) and Docker Compose
+- Bash / POSIX shell environment
 - Git (with submodule support)
 
 ## Quick Start
 
 1. Clone with submodules: `git submodule update --init --recursive`
-2. Configure `.env` (e.g. `PORT=3000`) and ensure `docker-compose.yml` is present.
-3. Run **install** → **start** → **monitor** to verify the stack boots.
+2. Configure `.env` (e.g. `PORT=3000`) if needed.
+3. Run **install** → [`run-{PORT}.sh`](run.sh) → **log-status** to verify the stack boots.
 
-| Action | Linux / macOS | Windows |
-|--------|---------------|---------|
-| Install | `./install.sh` | `install.bat` |
-| Start | `./start.sh` | `start.bat` |
-| Stop | `./stop.sh` | `stop.bat` |
-| Monitor | `./monitor.sh` | `monitor.bat` |
+| Action | Command |
+|--------|---------|
+| Install | `./install.sh` |
+| Run | [`run-{PORT}.sh`](run.sh) (e.g. `./run-3000.sh` → `./run.sh`) |
+| Stop | `./stop.sh` |
+| Log & Status | `./log-status.sh` |
+| Restart | `./restart.sh` |
 
-Optional: `restart.{sh,bat}` calls stop then start. Started processes run in the background.
+Started processes run in the background. `./restart.sh` calls stop then run.
 
-## Submodules
+### Execution Flow
 
-**Do not edit files inside submodule directories from this repo.** Update content upstream, then bump the tracked commit reference here.
+```mermaid
+flowchart TD
+    A["Install Dependencies<br/>(./install.sh)"] --> B["Start Service<br/>(./run-{PORT}.sh -> ./run.sh)"]
+    B --> C["Log & Status Check<br/>(./log-status.sh)"]
+    C --> D{"Action"}
+    D -- "Restart" --> E["Restart Service<br/>(./restart.sh)"]
+    E --> C
+    D -- "Stop" --> F["Stop Service<br/>(./stop.sh)"]
+```
+
+## Submodules & Subfolders
+
+**Do not edit files inside subfolder or submodule directories from this repo.** Create patches or modifications on the root repository only. Update content upstream, then bump the tracked commit reference here.
 
 ## Testing & Issues
 
