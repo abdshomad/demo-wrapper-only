@@ -35,6 +35,10 @@ flowchart TD
 > [!IMPORTANT]
 > **Never edit, update, delete, or commit changes inside subfolders or Git submodules.** Create patches or modifications on the root repository (this folder) only. Update upstream or bump the tracked commit reference in this repo.
 
+## Python
+
+Python apps always use `uv` for dependencies and running (`uv init`, `uv add`, `uv sync`, `uv run`). Wrapper scripts install with `uv sync` (for `pyproject.toml` subfolders) and launch via `uv run` (project `.venv`, never system `pip`/`python3`).
+
 ## E2E Testing
 
 Verify features with browser tools. Save screenshots to:

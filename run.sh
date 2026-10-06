@@ -3,22 +3,29 @@
 [ -f .env ] && export $(grep -v '^#' .env | xargs)
 [ -n "$PORT" ] && ln -sf run.sh "run-${PORT}.sh" 2>/dev/null || true
 rm -f .app.pid
+export PATH="$HOME/.local/bin:$PATH"
 if ! command -v pm2 >/dev/null 2>&1; then
     echo "pm2 not found. Run ./install.sh first."
     exit 1
 fi
 # Pre-check: mirror ecosystem.config.js detection for a clean error.
-has_app=0
-[ -f package.json ] && has_app=1
-if [ "$has_app" -eq 0 ]; then
+has_node=0
+has_python=0
+[ -f package.json ] && has_node=1
+if [ "$has_node" -eq 0 ]; then
     for sub in */; do
         [ -d "$sub" ] || continue
         case "$sub" in .*/|node_modules/|screenshots/|issues/) continue;; esac
-        if [ -f "${sub}package.json" ] || [ -f "${sub}app.py" ]; then has_app=1; break; fi
+        if [ -f "${sub}package.json" ]; then has_node=1; break; fi
+        if [ -f "${sub}app.py" ]; then has_python=1; break; fi
     done
 fi
-if [ "$has_app" -eq 0 ]; then
+if [ "$has_node" -eq 0 ] && [ "$has_python" -eq 0 ]; then
     echo "No app found: add root package.json or a subfolder with package.json/app.py"
+    exit 1
+fi
+if [ "$has_python" -eq 1 ] && ! command -v uv >/dev/null 2>&1; then
+    echo "uv not found. Run ./install.sh first."
     exit 1
 fi
 APP_NAME=${APP_NAME:-demo-app}
